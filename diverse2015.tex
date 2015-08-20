@@ -1,0 +1,77 @@
+
+\documentclass{sig-alternate}
+
+\usepackage[none]{hyphenat}
+\sloppy
+
+\begin{document}
+\conferenceinfo{\textit{MediaEval 2015 Workshop,}}{Sept. 14-15, 2015, Wurzen, Germany}
+
+\title{DCLab at MediaEval2015 Retrieving Diverse \\ Social Images Task}
+
+\numberofauthors{3}
+
+\author{
+\alignauthor
+Zsombor Par\'oczi\\
+       \affaddr{Budapest University of Technology and Economics}\\
+       \email{paroczi@tmit.bme.hu}
+\alignauthor
+Kis-Kir\'aly M\'at\'e \\
+		\affaddr{Budapest University of Technology and Economics}\\
+		\email{kis.kiraly.mate@gmail.com>}
+\alignauthor
+D\'aniel Mira\\
+		\affaddr{Budapest University of Technology and Economics}\\
+		\email{miradaniellevente@gmail.com}
+}
+
+\maketitle
+\begin{abstract}
+TODO abstract
+\end{abstract}
+
+\section{Introduction}
+
+Many potential tourists do websearches when they try to find more information about a place he (or she) is potentially visiting. These people have only a vague idea about the location, knowing the name of the place. Our aim is to help them by providing a set of photos, as summary of the different views of the location. 
+
+In the official challenge (Retrieving Diverse Social Images at MediaEval 2014: Challenge, Dataset and Evaluation) \cite{ionescu2014retrieving} a ranked list of location photos retrieved from Flickr (using text information) is given, and the task is, to refine the results by providing a set of images that are both relevant and provide a diversified summary. The diversity means that images can illustrate different views of the location at different times of the day/year and under different weather conditions, creative views, etc. ...
+
+The goodness of the refinement process can be measured using the precision and diversity metric~\cite{Taneva:2010:GRP:1718487.1718541}. Earlier we have solved a very similar problem by diversification of initial results using clustering~\cite{szHucs2013bmemtm}, but our solution was focused on diversification only. The largest development of this paper is that we focus on both the relevance and diversity.
+
+
+When processing an ordering (from the test data set) we give the relevance score of $p_k$ to the $k$th element of the ordering.
+
+\section{Results and Conclusion}
+
+\begin{table}[h]
+\begin{tabular}{|l|r|r|r|}
+	\hline 
+	run name & P@20 & CR@20 & F1@20\tabularnewline
+	\hline 
+	\hline 
+	VisClusterAvgRelevance & .7602 & .4107 & .5259\tabularnewline
+	\hline 
+	TextClusterAvgRelevance & .7809 & .4065 & .527\tabularnewline
+	\hline 
+	VisTextClusterAvgRelevance & .7756 & .4127 & .5305\tabularnewline
+	\hline 
+	VisTextClusterCredRelevance & .7415 & .3651 & .4819\tabularnewline
+	\hline 
+	VisTextClusterMixedRelevance & .7431 & .3682 & .4866\tabularnewline
+	\hline 
+\end{tabular}
+\caption{Average results of the five approaches}
+\end{table}
+
+\includegraphics[width=0.9\linewidth]{p}
+
+\includegraphics[width=0.9\linewidth]{cr}
+
+\includegraphics[width=0.9\linewidth]{f1}
+
+
+\bibliographystyle{abbrv}
+\bibliography{sigproc}
+
+\end{document}
