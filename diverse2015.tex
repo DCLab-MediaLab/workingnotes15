@@ -33,43 +33,65 @@ TODO abstract
 
 \section{Introduction}
 
-Many potential tourists do websearches when they try to find more information about a place he (or she) is potentially visiting. These people have only a vague idea about the location, knowing the name of the place. Our aim is to help them by providing a set of photos, as summary of the different views of the location. 
+When a potential tourist makes a search on a place, he (or she) want's to have a diverse and relevant visual result as a summary of the different views of the location. 
 
-In the official challenge (Retrieving Diverse Social Images at MediaEval 2014: Challenge, Dataset and Evaluation) \cite{ionescu2014retrieving} a ranked list of location photos retrieved from Flickr (using text information) is given, and the task is, to refine the results by providing a set of images that are both relevant and provide a diversified summary. The diversity means that images can illustrate different views of the location at different times of the day/year and under different weather conditions, creative views, etc. ...
+In the official challenge (Retrieving Diverse Social Images at MediaEval 2015: Challenge, Dataset and Evaluation) \cite{Task2015} a ranked list of location photos retrieved from Flickr is given, and the task is, to refine the results by providing a set of images that are both relevant and provide a diversified summary. The diversity means that images can illustrate different views of the location at different times of the day/year and under different weather conditions, creative views, etc. The goodness of the refinement process can be measured using the precision and diversity metric~\cite{Taneva:2010:GRP:1718487.1718541}. 
 
-The goodness of the refinement process can be measured using the precision and diversity metric~\cite{Taneva:2010:GRP:1718487.1718541}. Earlier we have solved a very similar problem by diversification of initial results using clustering~\cite{szHucs2013bmemtm}, but our solution was focused on diversification only. The largest development of this paper is that we focus on both the relevance and diversity.
+Our team participated in previous challanges \cite{szHucs2013bmemtm,Paroczi2014}, each year we experimented with a different approach. In 2013 we used diversification of initial results using clustering, but our solution was focused on diversification only. In 2014 we tried to focused on relevance and diversity with the same importance, as a new idea.
 
+In this paper and in this year's challange we used a more sofisticated distance based clustering method, where we crafted the distance matrix ourself rather then using some n dimension based clustering with an eucledian distance function.
 
-When processing an ordering (from the test data set) we give the relevance score of $p_k$ to the $k$th element of the ordering.
+\section{Runs}
+
+\subsection{Run1: Visual based reranking}
+
+\subsection{Run2: Text based reranking}
+
+\subsection{Run3: Text + Visual}
+
+\subsection{Run4: Credibility based reranking}
 
 \section{Results and Conclusion}
 
 \begin{table}[h]
+	\centering
 \begin{tabular}{|l|r|r|r|}
 	\hline 
 	run name & P@20 & CR@20 & F1@20\tabularnewline
 	\hline 
 	\hline 
-	VisClusterAvgRelevance & .7602 & .4107 & .5259\tabularnewline
+	Visual single & .7022 & .3702 & .4751\tabularnewline
 	\hline 
-	TextClusterAvgRelevance & .7809 & .4065 & .527\tabularnewline
+	Visual multi & .7164 & .3857 & .4813\tabularnewline
 	\hline 
-	VisTextClusterAvgRelevance & .7756 & .4127 & .5305\tabularnewline
+	Text single & .6435 & .3494 & .4379\tabularnewline
 	\hline 
-	VisTextClusterCredRelevance & .7415 & .3651 & .4819\tabularnewline
+	Text multi & .7021 & .3813 & .4748\tabularnewline
 	\hline 
-	VisTextClusterMixedRelevance & .7431 & .3682 & .4866\tabularnewline
+	Vistext single & .6732 & .3563 & .4554\tabularnewline
+	\hline 
+	Vistext multi & .6993 & .3683 & .4651\tabularnewline
+	\hline 
+	Cred single & .7014 & .3589 & .4651\tabularnewline
+	\hline 
+	Cred multi & .7150 & .3498 & .4479\tabularnewline
 	\hline 
 \end{tabular}
-\caption{Average results of the five approaches}
+\label{table:results}
+\caption{Average results of the approaches}
 \end{table}
 
-\includegraphics[width=0.9\linewidth]{p}
+\begin{figure}[h]
+\includegraphics[width=1.0\linewidth]{f1}
+\caption{F1@N results}
+\label{fig:f1}
+\end{figure}
 
-\includegraphics[width=0.9\linewidth]{cr}
+Our results can be seen on Table \ref{table:results}. and the F1 metrics can be seend on Figure \ref{fig:f1}, we listed the single and multi concept based separately. 
 
-\includegraphics[width=0.9\linewidth]{f1}
+As you can see the visual based results are the best among the results, from the devset we found out, that the text based information for the images are in a lot of cases missing, or don't represent the images well. It's not uncommon that an author gives the same textual information to all of the images in a topic.
 
+The credibility based results are better, then we expected, since our method basicly eliminates some authors from the results, which can have a negative effect on the CR metric.
 
 \bibliographystyle{abbrv}
 \bibliography{sigproc}
