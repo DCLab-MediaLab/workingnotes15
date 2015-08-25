@@ -21,7 +21,7 @@ M\'at\'e Kis-Kir\'aly \\
 		\affaddr{Budapest University of Technology and Economics}\\
 		\email{kis.kiraly.mate@gmail.com}
 \alignauthor
-Fodor B\'alint\\
+B\'alint Fodor\\
 		\affaddr{Budapest University of Technology and Economics}\\
 		\email{balint.fodor@gmail.com}
 }
@@ -39,7 +39,7 @@ In the official challenge (Retrieving Diverse Social Images at MediaEval 2015: C
 
 Our team participated in previous challenges~\cite{szHucs2013bmemtm,Paroczi2014}, each year we experimented with a different approach. In 2013 we used diversification of initial results using clustering, but our solution was focused on diversification only. In 2014 we tried to focus on relevance and diversity with the same importance as a new idea.
 
-In the past we treated our feature vectors (calculated values from metrics) as an $N$ dimensional continuous space with eucledian coordinates. In this paper we will define a hand crafted distance matrixes with non-eucledian coordinates, which can be used during the clustering. 
+In the past we treated our feature vectors (calculated values from metrics) as an $N$ dimensional continuous space with eucledian coordinates. In this paper we will define a hand crafted distance matrices with non-eucledian coordinates, which can be used during the clustering. 
 
 \section{Runs}
 
@@ -53,7 +53,7 @@ image area~\cite{szHucs2013bmemtm}. Then we used the $CN$ metric to filter out b
 
 In the reordering step we started from the original result. We did our initial filtering by putting images to the end of the result list where $FACE>0$ or $CN[0]>0.8$, the first value in $CN$ corresponds to the color black.
 
-After the preprocessing step we built the distance matrix $F$, between each $A$ and $B$ images the distance calculated using the following equation:
+After the preprocessing step we built the distance matrix $F$, between each $A$ and $B$ images the distance was calculated using the following equation:
 
 \begin{gather*} 
 F_{A,B} = \sum_{i=0}^{10}  \left | CN_{A}[i]-CN_{B}[i] \right | +\sum_{i=0}^{10} \left | s_i * (CM_{A}[i]-CM_{B}[i]) \right |\\
