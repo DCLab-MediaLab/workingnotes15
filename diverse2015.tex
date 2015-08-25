@@ -19,7 +19,7 @@ Zsombor Par\'oczi\\
 \alignauthor
 Kis-Kir\'aly M\'at\'e \\
 		\affaddr{Budapest University of Technology and Economics}\\
-		\email{kis.kiraly.mate@gmail.com>}
+		\email{kis.kiraly.mate@gmail.com}
 \alignauthor
 D\'aniel Mira\\
 		\affaddr{Budapest University of Technology and Economics}\\
@@ -28,41 +28,65 @@ D\'aniel Mira\\
 
 \maketitle
 \begin{abstract}
-In this paper we recommend a social image re-ranking method to the MediaEval 2015 Retrieving Diverse Social Images Task in order to increase the accurate of the searching result of Flickr based on the metrics relevance and diversity. In our approach the new ranking is the modification of the original queue, considering and recalculating the diversity to every re-ranked item. We have used color related visual features and text descriptors to define similarity between images with our distance based spectral clustering method.
+In this paper we recommend a social image re-ranking method form the MediaEval 2015 Retrieving Diverse Social Images Task in order to increase the accuracity of a search result on Flickr based on relevance and diversity. Our approach is based on reranking the original result, using precalculated distance matrix to increase diversity. We have used color related visual features, text and credibility descriptors to define similarity between images.
 \end{abstract}
 
 \section{Introduction}
 
 When a potential tourist makes a search on a place, he (or she) want's to have a diverse and relevant visual result as a summary of the different views of the location. 
 
-In the official challenge (Retrieving Diverse Social Images at MediaEval 2015: Challenge, Dataset and Evaluation) \cite{Task2015} a ranked list of location photos retrieved from Flickr is given, and the task is, to refine the results by providing a set of images that are both relevant and provide a diversified summary. The diversity means that images can illustrate different views of the location at different times of the day/year and under different weather conditions, creative views, etc. The goodness of the refinement process can be measured using the precision and diversity metric~\cite{Taneva:2010:GRP:1718487.1718541}. 
+In the official challenge (Retrieving Diverse Social Images at MediaEval 2015: Challenge, Dataset and Evaluation)~\cite{Task2015} a ranked list of location photos retrieved from Flickr is given, and the task is, to refine the results by providing a set of images that are both relevant and provide a diversified summary. The diversity means that images can illustrate different views of the location at different times of the day/year and under different weather conditions, creative views, etc. The goodness of the refinement process can be measured using the precision and diversity metric~\cite{Taneva:2010:GRP:1718487.1718541}. 
 
-Our team participated in previous challanges \cite{szHucs2013bmemtm,Paroczi2014}, each year we experimented with a different approach. In 2013 we used diversification of initial results using clustering, but our solution was focused on diversification only. In 2014 we tried to focused on relevance and diversity with the same importance, as a new idea.
+Our team participated in previous challanges~\cite{szHucs2013bmemtm,Paroczi2014}, each year we experimented with a different approach. In 2013 we used diversification of initial results using clustering, but our solution was focused on diversification only. In 2014 we tried to focused on relevance and diversity with the same importance, as a new idea.
 
-In this paper and in this year's challange we used a more sofisticated distance based clustering method, where we crafted the distance matrix ourself rather then using some n dimension based clustering with an eucledian distance function.
+In this paper and in this year's challange we used a more sofisticated distance based clustering method, where we crafted the distance matrix ourself rather then using some $n$ dimension based clustering with an eucledian distance function. 
 
 \section{Runs}
 
 \subsection{Run1: Visual based reranking}
-The main idea based on the previous papers \cite{szHucs2013bmemtm,Paroczi2014} is detecting and filtering photos with people (faces) on it, and after the preprocessing phase we build our distance matrix in order to define relevant and diverse images. 
+In the first subtask participants could use only visual based metrics or own metrics calculated using only the images.
 
-At first sight we designed our method using HOG features, but no significant results could be reached with HOG vector difference. Therefore we recommend a color only based clustering method, without using any other potential features such as shape or texture related descriptors.
+Our main idea was using color based distances~\cite{Datta2008,Paramita2010} and filtering photos with faces on them~\cite{szHucs2013bmemtm,Paroczi2014}. We experimented with HOG feature distances, but didn't achieve any additional improvement.
 
-The first preprocessing step is calculating two values to the image: first the $FACE$ feature, which is the ratio of the faces on the image, and the second is the ratio of the black color ($CN[0]$) on each image. Using this two values on each images, we are able to increase the diverse and relevance of the result set by putting images to the end of the queue where $FACE=0.0$ or $CN[0]>0.8$. With this step we removed the images with people on it (e.g. family photos) and dark images (e.g. fireworks).
-After the preprocessing steps we build the distance $D1$ matrix between each $A$ and $B$ images: $D1_{AB}=|CN_{A}-CN_{B}|+[5*Diff(CM_{A},CM_{B})]$, where $Diff$ function is the difference of the $CM$ vectors with unique weighting on the different dimensions: $CM[0], .. ,CM[2]: 1; CM[3], .. ,CM[5]: 0.3; CM[6], .. ,CM[8]: 0.1$.
+First we calculated a new value to the image: the $FACE$ feature, which is the ratio of the faces on an image~\cite{szHucs2013bmemtm}. Then we used the $CN$ metric to filter out black color based images, since mostly dark images tent to have less colors and those are mainly shifted into the gray region rather then having bright colors. 
+
+In the reordering step we started from the original ordering. We did our initial filtering by putting images to the end of the result list where $FACE=0.0$ or $CN[0]>0.8$. With this step we removed the images with people on it (e.g. family photos) and dark images (e.g. fireworks). 
+
+After the preprocessing steps we build the distance $D$ matrix between each $A$ and $B$ images is calculated using the following equation:
+
+\begin{gather*} 
+D_{A,B} = \sum_{i=0}^{10}  \left | CN_{A}[i]-CN_{B}[i] \right | +\sum_{i=0}^{10} \left | s_i * (CM_{A}[i]-CM_{B}[i]) \right |\\
+s_i = \left\{\begin{matrix}
+5 \textup{, where }0 \leqslant  i < 3\\ 
+1.5 \textup{, where }3 \leqslant  i < 5\\ 
+0.5 \textup{, where }5 \leqslant  i < 9
+\end{matrix}\right.
+\end{gather*}
+
+After the distance matrix was created we used spectral clustering~\cite{Ma2009,Ng01onspectral} to create clusters from the first 150 images, the target cluster count was 10. 
+
+The final result was generated by picking the lowest ranking item from each cluster, appending those to the result list, then repeating this until all item is used.
 
 \subsection{Run2: Text based reranking}
 The second subtask was the text based reranking which is accomplished using the title, tags and description fields of each images and then comparison based on TF-IDF numerical statistic and our distance calculating method.
 
-As a preprocessing step we execute a stop words filtering and also remove some special characters which have no value (e.g. html tags). At the next step we calculate TF-IDF values and distance between texts (e.g. description fields) $A$ and $B$ in the following manner. We initalize distance $D2$ as zero and compare $A$ and $B$ in term level. All occurring $t$ terms in document $A$ compared with all terms in document $B$ and so on. If term $t$ is contained by both document, then $D2$ will be increased by $0$. Else, if $t$ contained by only one document, we take into consideration the $DF$: if $DF<5$, then it is a rare term and $D$ increased by $2$; if $DF>DN/4$, then it is a common term and  $D2$ increased by 0.1 (where $DN$ is the total number of documents).
+As a preprocessing step we executed a stop word filtering and also remove some special characters (namely: .,-:;0123456789()\_@) and some remaining HTML parts ( \&amp;, \&quot; and everything betweek < and >), then we used the remaining text as the input for a simple TF-DF calculation~\cite{Yeh2008}. 
+
+Then we calculated the distance between images (e.g. description fields) $A$ and $B$ in the following manner. We initalize distance $D$ as zero and compare $A$ and $B$ in term level. All occurring $t$ terms in document $A$ compared with all terms in the document $B$ and so on. If term $t$ is contained by both document, then $D2$ will be increased by $0$. If $t$ contained by only one document, we take into consideration the $DF$: if $DF<5$, then it is a rare term and $D$ increased by $2$; if $DF>DN/4$, then it is a common term and  $D2$ increased by $0.1$ (where $DN$ is the total number of documents). If the term is not common nor rare, then we added the $DF/document count$ to the distance.
+
+Using the hree text descriptors we created a weighted sum for the field distences, where the weight are as follows: title=1, tags=2, description=0.5
+
+After we had the distance matrix we used the same reranking steps as in run1.
 
 \subsection{Run3: Text + Visual}
-We used our visual distance matrix $D1$ and text distance matrix $D2$ to create a new aggregate matrix $D3$. It is produced by simple summation of the corresponding values of both $D1$ and $D2$ matrix, where the actual item of each matrix corresponds to the same image. We tried different kind of weithing methods, but the pure matrices supplied the best results without any further modification.
+In the third subtask botwh visual and textual descriptors could be used to create the results.
+
+We used our visual distance matrix $D1$ and text distance matrix $D2$ and create a new aggregate matrix $D3$. This matrix is simply the sum of the corresponding values from both $D1$ and $D2$ matrix. We tried different kind of weithing methods, but the pure matrices supplied the best results on the devset without any further modification.
 
 \subsection{Run4: Credibility based reranking}
-We present our solution to the credibility subtask which was refined and filtered by $faceProportion$ and $locationSimilarity$ values.
+In the fourth run participants were provided with credibility descriptors detailed in \cite{Task2015}.
 
-As a first step we re-ranked images which were originally at the end of the queue: each image after the 100th position in the original queue were put the end of the re-ranked queue, in order to increase the relevance of the result set. The $faceProportion$ variable is used to purify the result set by putting the images to the end of the queue, where the face ratio is more than $1.3$. With the purpose of increase the diversity we defined $locationSimilarity$ with a threshold at $3.0$. If the value of the variable exceed the threshold, the image will be moved to the end of the queue. This means, images with similar location  will not be chosen to the result set repeatedly.
+Using the original result we filtered the images by users who had $faceProportion$ more than $1.3$ to create the same effect as we did with the $FACE$ metric. With the purpose of increase the diversity we used the $locationSimilarity$ metric, if this value exceed the threshold of $3.0$ we exluded the images. Despite our simple approach we had great results on the devset.
 
 \section{Results and Conclusion}
 
@@ -100,11 +124,9 @@ As a first step we re-ranked images which were originally at the end of the queu
 \label{fig:f1}
 \end{figure}
 
-Our results can be seen on Table \ref{table:results}. and the F1 metrics can be seend on Figure \ref{fig:f1}, we listed the single and multi concept based separately. 
+Our results can be seen on Table \ref{table:results}. and the F1 metrics can be seend on Figure \ref{fig:f1}, we listed the single and multi concept based results separately. 
 
-As you can see the visual based results are the best among the results, from the devset we found out, that the text based information for the images are in a lot of cases missing, or don't represent the images well. It's not uncommon that an author gives the same textual information to all of the images in a topic.
-
-The credibility based results are better, then we expected, since our method basicly eliminates some authors from the results, which can have a negative effect on the CR metric.
+As you can see the visual based results are the best from the runs, from the devset we found out, that the text based information for the images are in a lot of cases missing, or don't represent the images well. It's not uncommon that an author gives the same textual information to all of the images in a topic.
 
 \bibliographystyle{abbrv}
 \bibliography{sigproc}
