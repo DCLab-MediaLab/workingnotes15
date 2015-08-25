@@ -17,43 +17,43 @@ Zsombor Par\'oczi\\
        \affaddr{Budapest University of Technology and Economics}\\
        \email{paroczi@tmit.bme.hu}
 \alignauthor
-Kis-Kir\'aly M\'at\'e \\
+M\'at\'e Kis-Kir\'aly \\
 		\affaddr{Budapest University of Technology and Economics}\\
 		\email{kis.kiraly.mate@gmail.com}
 \alignauthor
-D\'aniel Mira\\
+Fodor B\'alint\\
 		\affaddr{Budapest University of Technology and Economics}\\
-		\email{miradaniellevente@gmail.com}
+		\email{balint.fodor@gmail.com}
 }
 
 \maketitle
 \begin{abstract}
-In this paper we recommend a social image re-ranking method form the MediaEval 2015 Retrieving Diverse Social Images Task in order to increase the accuracy of a search result on Flickr based on relevance and diversity. Our approach is based on reranking the original result, using precalculated distance matrix to increase diversity. We use color related visual features, text and credibility descriptors to define similarity between images.
+In this paper we recommend a social image re-ranking method from the Retrieving Diverse Social Images Task at MediaEval 2015 in order to increase the accuracy of a search result on Flickr based on relevance and diversity. Our approach is based on re-ranking the original result, using a precalculated distance matrix with spectral clustering. We use color related visual features, text and credibility descriptors to define similarity between images.
 \end{abstract}
 
 \section{Introduction}
 
 When a potential tourist makes an image search for a place, she expects to get a diverse and relevant visual result as a summary of the different views of the location. 
 
-In the official challenge (Retrieving Diverse Social Images at MediaEval 2015: Challenge, Dataset and Evaluation)~\cite{Task2015} a ranked list of location photos retrieved from Flickr is given, and the task is to refine the results by providing a set of images that are both relevant and provide a diversified summary. An extended explanation for each metric referred in this paper can be found in the cited paper. The diversity means that images can illustrate different views of the location at different times of the day/year and under different weather conditions, creative views, etc. The utility score of the refinement process can be measured using the precision and diversity metric~\cite{Taneva2010}. 
+In the official challenge (Retrieving Diverse Social Images at MediaEval 2015: Challenge, Dataset and Evaluation)~\cite{Task2015} a ranked list of location photos retrieved from Flickr is given, and the task is to refine the result by providing a set of images that are both relevant and provide a diversified summary. An extended explanation for each metric referred in this paper can be found in the task description paper \cite{Task2015}. The diversity means that images can illustrate different views of the location at different times of the day/year and under different weather conditions, creative views, etc. The utility score of the refinement process can be measured using the precision and diversity metric~\cite{Taneva2010}. 
 
-Our team participated in previous challanges~\cite{szHucs2013bmemtm,Paroczi2014}, each year we experimented with a different approach. In 2013 we used diversification of initial results using clustering, but our solution was focused on diversification only. In 2014 we tried to focus on relevance and diversity with the same importance as a new idea.
+Our team participated in previous challenges~\cite{szHucs2013bmemtm,Paroczi2014}, each year we experimented with a different approach. In 2013 we used diversification of initial results using clustering, but our solution was focused on diversification only. In 2014 we tried to focus on relevance and diversity with the same importance as a new idea.
 
-In the past we treated our feature vectors (calculated values from metrics) as an N dimensional continuous space with eucledian coordinates. In this paper we will define a non-eucledial coordinates and a hand crafted the distance matrix, which can be used during the clustering. 
+In the past we treated our feature vectors (calculated values from metrics) as an $N$ dimensional continuous space with eucledian coordinates. In this paper we will define a hand crafted distance matrixes with non-eucledian coordinates, which can be used during the clustering. 
 
 \section{Runs}
 
-\subsection{Run1: Visual based reranking}
+\subsection{Run1: Visual based re-ranking}
 In the first subtask participants could use only visual based metrics or own metrics calculated using only the images.
 
-Our main approach was using color based distances~\cite{Datta2008,Paramita2010} and filtering photos with faces on them~\cite{szHucs2013bmemtm,Paroczi2014}. We experimented with HOG feature distances but did not achieve any additional improvement.
+Our main approach was using color based distances~\cite{Datta2008} and filtering photos with faces on them~\cite{szHucs2013bmemtm,Paroczi2014}. We experimented with HOG feature distances but did not achieve any additional improvement.
 
-First we calculated a new value to the image: the $FACE$ feature is the ratio of the calculated area occupied by the possible face regions on an image and whole
+First we calculated a new metric for each image: the $FACE$ metric is the ratio of the calculated area occupied by the possible face regions on an image and whole
 image area~\cite{szHucs2013bmemtm}. Then we used the $CN$ metric to filter out black color based images, since mostly dark images tend to have less colors and those are mainly shifted into the gray region rather then having bright colors.
 
-In the reordering step we started from the original ordering. We did our initial filtering by putting images to the end of the result list where $FACE=0.0$ or $CN[0]>0.8$, the first value in $CN$ corresponds to the color black. With this step we removed the images showing mainly people (e.g. tourist photographing eachother) and the dark images (e.g. fireworks). 
+In the reordering step we started from the original result. We did our initial filtering by putting images to the end of the result list where $FACE>0$ or $CN[0]>0.8$, the first value in $CN$ corresponds to the color black.
 
-After the preprocessing steps we build the distance $F$ matrix between each $A$ and $B$ images is calculated using the following equation:
+After the preprocessing step we built the distance matrix $F$, between each $A$ and $B$ images the distance calculated using the following equation:
 
 \begin{gather*} 
 F_{A,B} = \sum_{i=0}^{10}  \left | CN_{A}[i]-CN_{B}[i] \right | +\sum_{i=0}^{10} \left | s_i * (CM_{A}[i]-CM_{B}[i]) \right |\\
@@ -66,25 +66,23 @@ s_i = \left\{\begin{matrix}
 
 After the distance matrix was created we used spectral clustering~\cite{Ma2009,Ng01onspectral} to create clusters from the first 150 images, the target cluster count was 10. 
 
-The final result was generated by picking the lowest ranking item from each cluster, appending those to the result list, then repeating this until all the items are used.
+The final result was generated by picking the lowest ranking item from each cluster, appending those to the result list, then repeating this until all the items are used. The same clustering and sorting method was used during run2 and run3.
 
-\subsection{Run2: Text based reranking}
-The second subtask was the text based reranking which is accomplished using the title, tags and description fields of each image. The comparison is based on the TF-IDF metric and our distance calculating method.
+\subsection{Run2: Text based re-ranking}
+The second subtask was the text based re-ranking which is accomplished using the title, tags and description fields of each image.
 
-As a preprocessing step we executed a stop word filtering. We also removed some special characters (namely: .,-:;0123456789()\_@) and HTML specific character sets ( \&amp;, \&quot; and everything betweek < and >), then we used the remaining text as the input for a simple TF-DF calculation~\cite{Yeh2008}. 
+As a preprocessing step we executed a stop word filtering. We also removed some special characters (namely: .,-:;0123456789()\_@) and HTML specific character sets ( \&amp;, \&quot; and everything between < and >), then we used the remaining text as the input for a simple TF-IDF calculation~\cite{Yeh2008}. 
 
- We calculated the distance between images (e.g. description fields) $A$ and $B$ in the following manner. We initalize distance $G_{A,B}$ as zero and compare $A$ and $B$ in term level. All occurring $t$ terms in document $A$ compared with all terms in the document $B$ and so on. If term $t$ is contained by both document, then $G_{A,B}$ will be increased by $0$. If $t$ contained by only one document, we take into consideration the document frequency ($DF_t$): if $DF_t<5$, then it is a rare term and $G_{A,B}$ increased by $2$; if $DF_t>DN/4$, then it is a common term and  $G_{A,B}$ increased by $0.1$ (where $DN$ is the total number of documents). If the term is not common nor rare, then we added the $DF_t/DN$ to the distance. From these $G_{A,B}$ values we created the $G$ distance matrix.
-
-Using the hree text descriptors we created a weighted sum for the field distences, where the weight are as follows: title=$1$, tags=$2$, description=$0.5$
-
-The same reranking algorithm was applied as detailed in run1.
+ We calculated the distance between images (e.g. description fields) $A$ and $B$ in the following manner. We initalize distance $G_{A,B}$ as zero and compared $A$ and $B$ at the term level. All occurring $t$ terms in document $A$ compared with all terms in the document $B$ and so on. If term $t$ is contained by both document, then $G_{A,B}$ will be increased by $0$. If $t$ contained by only one document, we take into consideration the document frequency ($DF_t$): if $DF_t<5$, then it is a rare term and $G_{A,B}$ should be increased by $2$; if $DF_t>DN/4$, then it is a common term and  $G_{A,B}$ should be increased by $0.1$ (where $DN$ is the total number of documents). If the term is not common nor rare, then we added the $DF_t/DN$ to the distance. 
+ 
+Using the three text descriptors we created a weighted sum for the field distences, where the weight are as follows: title=$1$, tags=$2$, description=$0.5$ From these $G_{A,B}$ values we created the $G$ distance matrix.
 
 \subsection{Run3: Text + Visual}
 In the third subtask both visual and textual descriptors could be used to create the results.
 
-We used our visual distance matrix $F$ and text distance matrix $G$ and create a new aggregate matrix $H$. This matrix is simply the sum of the corresponding values from both $F$ and $G$ matrix. We tried different kind of weighting methods, but the pure matrices supplied the best results on the devset without any further modification.
+We used our visual distance matrix $F$ and text distance matrix $G$ and created a new aggregate matrix $H$. This matrix is simply the sum of the corresponding values from both $F$ and $G$ matrix. We tried different kind of weighting methods, but the pure matrices supplied the best results on the devset.
 
-\subsection{Run4: Credibility based reranking}
+\subsection{Run4: Credibility based re-ranking}
 In the fourth run participants were provided with credibility descriptors detailed in \cite{Task2015}.
 
 Using the original result we filtered the images by users who had $faceProportion$ more than $1.3$ to create the same effect as we did with the $FACE$ metric. With the purpose of increase the diversity we used the $locationSimilarity$ metric, if this value exceeds the threshold of $3.0$ we exluded the image. Despite our simple approach we had great results on the devset.
@@ -98,25 +96,25 @@ Using the original result we filtered the images by users who had $faceProportio
 	run name & P@20 & CR@20 & F1@20\tabularnewline
 	\hline 
 	\hline 
-	Visual single & .7022 & .3702 & .4751\tabularnewline
+	Run1 single & .7022 & .3702 & .4751\tabularnewline
 	\hline 
-	Visual multi & .7164 & .3857 & .4813\tabularnewline
+	Run1 multi & .7164 & .3857 & .4813\tabularnewline
 	\hline 
-	Text single & .6435 & .3494 & .4379\tabularnewline
+	Run2 single & .6435 & .3494 & .4379\tabularnewline
 	\hline 
-	Text multi & .7021 & .3813 & .4748\tabularnewline
+	Run2 multi & .7021 & .3813 & .4748\tabularnewline
 	\hline 
-	Vistext single & .6732 & .3563 & .4554\tabularnewline
+	Run3 single & .6732 & .3563 & .4554\tabularnewline
 	\hline 
-	Vistext multi & .6993 & .3683 & .4651\tabularnewline
+	Run3 multi & .6993 & .3683 & .4651\tabularnewline
 	\hline 
-	Cred single & .7014 & .3589 & .4651\tabularnewline
+	Run4 single & .7014 & .3589 & .4651\tabularnewline
 	\hline 
-	Cred multi & .7150 & .3498 & .4479\tabularnewline
-	\hline 
+	Run4 multi & .7150 & .3498 & .4479\tabularnewline
+	\hline
 \end{tabular}
 \label{table:results}
-\caption{Average results of the approaches}
+\caption{Average results of each run}
 \end{table}
 
 \begin{figure}[h]
