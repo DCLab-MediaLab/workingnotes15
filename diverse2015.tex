@@ -35,12 +35,11 @@ In this paper we recommend a social image re-ranking method form the MediaEval 2
 
 When a potential tourist makes an image search for a place, she expects to get a diverse and relevant visual result as a summary of the different views of the location. 
 
-In the official challenge (Retrieving Diverse Social Images at MediaEval 2015: Challenge, Dataset and Evaluation)~\cite{Task2015} a ranked list of location photos retrieved from Flickr is given, and the task is to refine the results by providing a set of images that are both relevant and provide a diversified summary. The diversity means that images can illustrate different views of the location at different times of the day/year and under different weather conditions, creative views, etc. The utility score of the refinement process can be measured using the precision and diversity metric~\cite{Taneva:2010:GRP:1718487.1718541}. 
+In the official challenge (Retrieving Diverse Social Images at MediaEval 2015: Challenge, Dataset and Evaluation)~\cite{Task2015} a ranked list of location photos retrieved from Flickr is given, and the task is to refine the results by providing a set of images that are both relevant and provide a diversified summary. An extended explanation for each metric referred in this paper can be found in the cited paper. The diversity means that images can illustrate different views of the location at different times of the day/year and under different weather conditions, creative views, etc. The utility score of the refinement process can be measured using the precision and diversity metric~\cite{Taneva2010}. 
 
-Our team participated in previous challanges~\cite{szHucs2013bmemtm,Paroczi2014}, each year we experimented with a different approach. In 2013 we used diversification of initial results using clustering, but our solution was focused on diversification only. In 2014 we tried to focused on relevance and diversity with the same importance as a new idea.
+Our team participated in previous challanges~\cite{szHucs2013bmemtm,Paroczi2014}, each year we experimented with a different approach. In 2013 we used diversification of initial results using clustering, but our solution was focused on diversification only. In 2014 we tried to focus on relevance and diversity with the same importance as a new idea.
 
-% TODO: ezt a 'we craft the matrix ourself' tortenetet nem ertem
-In this paper we present a more sophisticated distance based clustering method. We crafted the distance matrix ourself rather then using some $n$ dimension based clustering with an eucledian distance function. 
+In the past we treated our feature vectors (calculated values from metrics) as an N dimensional continuous space with eucledian coordinates. In this paper we will define a non-eucledial coordinates and a hand crafted the distance matrix, which can be used during the clustering. 
 
 \section{Runs}
 
@@ -49,26 +48,21 @@ In the first subtask participants could use only visual based metrics or own met
 
 Our main approach was using color based distances~\cite{Datta2008,Paramita2010} and filtering photos with faces on them~\cite{szHucs2013bmemtm,Paroczi2014}. We experimented with HOG feature distances but did not achieve any additional improvement.
 
-% TODO: FACE metrikat szakszerubben: arcok teruletenek aranya a kep egesz meretehez kepest
-First we calculated a new value to the image: the $FACE$ feature, that is the ratio of the faces on an image~\cite{szHucs2013bmemtm}. Then we used the $CN$ metric to filter out black color based images, since mostly dark images tend to have less colors and those are mainly shifted into the gray region rather then having bright colors.
+First we calculated a new value to the image: the $FACE$ feature is the ratio of the calculated area occupied by the possible face regions on an image and whole
+image area~\cite{szHucs2013bmemtm}. Then we used the $CN$ metric to filter out black color based images, since mostly dark images tend to have less colors and those are mainly shifted into the gray region rather then having bright colors.
 
-% TODO: FACE=0.0 szures biztos 0.0? ez pont azt jelenti, h nincs rajta egy arc sem, nem ezeket akarjuk hatra tenni, vagy nem ertem
-% TODO: mit jelent a CN[0], gondolom a fekete szinek aranyat, de akkor ezt celszeru tisztazni
-In the reordering step we started from the original ordering. We did our initial filtering by putting images to the end of the result list where $FACE=0.0$ or $CN[0]>0.8$. With this step we removed the images showing mainly people (e.g. family photos) and the dark images (e.g. fireworks). 
+In the reordering step we started from the original ordering. We did our initial filtering by putting images to the end of the result list where $FACE=0.0$ or $CN[0]>0.8$, the first value in $CN$ corresponds to the color black. With this step we removed the images showing mainly people (e.g. tourist photographing eachother) and the dark images (e.g. fireworks). 
 
-After the preprocessing steps we build the distance $D$ matrix between each $A$ and $B$ images is calculated using the following equation:
+After the preprocessing steps we build the distance $F$ matrix between each $A$ and $B$ images is calculated using the following equation:
 
 \begin{gather*} 
-D_{A,B} = \sum_{i=0}^{10}  \left | CN_{A}[i]-CN_{B}[i] \right | +\sum_{i=0}^{10} \left | s_i * (CM_{A}[i]-CM_{B}[i]) \right |\\
+F_{A,B} = \sum_{i=0}^{10}  \left | CN_{A}[i]-CN_{B}[i] \right | +\sum_{i=0}^{10} \left | s_i * (CM_{A}[i]-CM_{B}[i]) \right |\\
 s_i = \left\{\begin{matrix}
 5 \textup{, where }0 \leqslant  i < 3\\ 
 1.5 \textup{, where }3 \leqslant  i < 5\\ 
 0.5 \textup{, where }5 \leqslant  i < 9
 \end{matrix}\right.
 \end{gather*}
-
-% TODO: mi a CM? ha ezek a jelolesek evidenciak, akkor viszont egy mondatot erdemes irni arrol a cikk elejen h a jelen cikkben hasznalt metrikak feloldasat es magyarazatat a \cite{versenykiiras} reszletezi.
-% az is erdekelne h az si tenyezok miert igy alakulnak, milyen megfontolasbol, de ha hosszu leirni akkor tenyleg nem kell
 
 After the distance matrix was created we used spectral clustering~\cite{Ma2009,Ng01onspectral} to create clusters from the first 150 images, the target cluster count was 10. 
 
@@ -79,18 +73,16 @@ The second subtask was the text based reranking which is accomplished using the 
 
 As a preprocessing step we executed a stop word filtering. We also removed some special characters (namely: .,-:;0123456789()\_@) and HTML specific character sets ( \&amp;, \&quot; and everything betweek < and >), then we used the remaining text as the input for a simple TF-DF calculation~\cite{Yeh2008}. 
 
-% TODO: bocs sracok, de ez semennyire nem ertheto, nem tudni mi az a D, DN, DF, D2
- We calculated the distance between images (e.g. description fields) $A$ and $B$ in the following manner. We initalize distance $D$ as zero and compare $A$ and $B$ in term level. All occurring $t$ terms in document $A$ compared with all terms in the document $B$ and so on. If term $t$ is contained by both document, then $D2$ will be increased by $0$. If $t$ contained by only one document, we take into consideration the $DF$: if $DF<5$, then it is a rare term and $D$ increased by $2$; if $DF>DN/4$, then it is a common term and  $D2$ increased by $0.1$ (where $DN$ is the total number of documents). If the term is not common nor rare, then we added the $DF/document count$ to the distance.
+ We calculated the distance between images (e.g. description fields) $A$ and $B$ in the following manner. We initalize distance $G_{A,B}$ as zero and compare $A$ and $B$ in term level. All occurring $t$ terms in document $A$ compared with all terms in the document $B$ and so on. If term $t$ is contained by both document, then $G_{A,B}$ will be increased by $0$. If $t$ contained by only one document, we take into consideration the document frequency ($DF_t$): if $DF_t<5$, then it is a rare term and $G_{A,B}$ increased by $2$; if $DF_t>DN/4$, then it is a common term and  $G_{A,B}$ increased by $0.1$ (where $DN$ is the total number of documents). If the term is not common nor rare, then we added the $DF_t/DN$ to the distance. From these $G_{A,B}$ values we created the $G$ distance matrix.
 
 Using the hree text descriptors we created a weighted sum for the field distences, where the weight are as follows: title=$1$, tags=$2$, description=$0.5$
 
-After that we have the distance matrix and the same reranking algorithm can be applied as detailed in run1.
+The same reranking algorithm was applied as detailed in run1.
 
 \subsection{Run3: Text + Visual}
 In the third subtask both visual and textual descriptors could be used to create the results.
 
-% TODO: itt vannak definialva a D1, D2, D3 matrixok, ezeket biztos fentebb kene megtenni, illetve fentebb van ilyenrol szo: 'then $D2$ will be increased by $0$', illene indexelni a matrixot ha egy elemet novelgetjuk
-We used our visual distance matrix $D1$ and text distance matrix $D2$ and create a new aggregate matrix $D3$. This matrix is simply the sum of the corresponding values from both $D1$ and $D2$ matrix. We tried different kind of weighting methods, but the pure matrices supplied the best results on the devset without any further modification.
+We used our visual distance matrix $F$ and text distance matrix $G$ and create a new aggregate matrix $H$. This matrix is simply the sum of the corresponding values from both $F$ and $G$ matrix. We tried different kind of weighting methods, but the pure matrices supplied the best results on the devset without any further modification.
 
 \subsection{Run4: Credibility based reranking}
 In the fourth run participants were provided with credibility descriptors detailed in \cite{Task2015}.
