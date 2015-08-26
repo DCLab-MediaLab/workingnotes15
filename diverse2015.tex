@@ -1,5 +1,5 @@
 
-\documentclass{sig-alternate}
+\documentclass{acm_proc_article-me}
 
 \usepackage[none]{hyphenat}
 \sloppy
@@ -46,7 +46,7 @@ In the past we treated our feature vectors (calculated values from metrics) as a
 \subsection{Run1: Visual based re-ranking}
 In the first subtask participants could use only visual based metrics or own metrics calculated using only the images.
 
-Our main approach was using color based distances~\cite{Datta2008} and filtering photos with faces on them~\cite{szHucs2013bmemtm,Paroczi2014}. We experimented with HOG feature distances but did not achieve any additional improvement.
+Our main approach was using color based distances~\cite{Datta2008,Paramita2010} and filtering photos with faces on them~\cite{szHucs2013bmemtm,Paroczi2014}. We experimented with HOG feature distances but did not achieve any additional improvement.
 
 First we calculated a new metric for each image: the $FACE$ metric is the ratio of the calculated area occupied by the possible face regions on an image and whole
 image area~\cite{szHucs2013bmemtm}. Then we used the $CN$ metric to filter out black color based images, since mostly dark images tend to have less colors and those are mainly shifted into the gray region rather then having bright colors.
