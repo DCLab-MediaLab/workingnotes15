@@ -99,7 +99,11 @@ We used our visual distance matrix $F$ and text distance matrix $G$  and created
 \subsection{Run4: Credibility based re-ranking}
 In the fourth run participants were provided with credibility descriptors \cite{Task2015}.
 
-Using the original result we filtered the images by users who had $faceProportion$ more than $1.3$ to create the same effect as we did with the $FACE$ descriptor. With the purpose of increasing the diversity we used the $locationSimilarity$ descriptor, if this value exceeds the threshold of $3.0$ we excluded the image. Despite our simple approach we had great results on the development set.
+Using the original result we filtered the images by users who had $faceProportion$ more than $1.3$ to create the same effect as we did with the $FACE$ descriptor.
+
+\pagebreak
+
+With the purpose of increasing the diversity we used the $locationSimilarity$ descriptor, if this value exceeds the threshold of $3.0$ we excluded the image. Despite our simple approach we had great results on the development set.
 
 \section{Results}
 
@@ -147,7 +151,7 @@ Our results can be seen in Table \ref{table:results}. and the F1 metrics can be 
 As one can see the visual information based results are the best among all the runs. In the development set we experienced that the textual information for many images are missing or do not describe the content very well. It is not uncommon that an author gives the same textual information to all of the images in a topic.
 
 The credibility based descriptors are proved to be much more useful than we initially thought, in the future we should focus on those to improve textual and visual descriptor based results.
-
+\newpage
 \bibliographystyle{abbrv}
 \bibliography{sigproc}
 
