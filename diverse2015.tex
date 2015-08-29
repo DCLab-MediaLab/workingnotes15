@@ -50,11 +50,8 @@ In the first run participants could use only visual based descriptors or own des
 
 For the first run we use the following approach: step 1 - calculating $FACE$ descriptor for each image, step 2 - filter the images using $FACE$ and $CN[0]$ descriptors, step 3 - creating a distance matrix from color similarity, step 4 - doing spectral clustering using the distance matrix, step 5 - using the cluster information create the new result list.
 
-Our main approach was using color based distances~\cite{Datta2008,Paramita2010} and filtering photos with faces~\cite{szHucs2013bmemtm,Paroczi2014}. We used two of the descriptors provided by the organizers~\cite{Task2015}:
-\begin{description}
-	\item[CM] Global Color Moments on HSV Color Space: represent the first three central moments of an image color distribution: mean, standard deviation and skewness
-	\item [CN] Global Color Naming Histogram: maps colors to 11 universal color names: "black", "blue", "brown", "grey", "green", "orange", "pink", "purple", "red", "white", and "yellow"
-\end{description}
+Our main approach was using color based distances~\cite{Datta2008,Paramita2010} and filtering photos with faces~\cite{szHucs2013bmemtm,Paroczi2014}. We used two of the descriptors provided by the organizers~\cite{Task2015}: Global Color Moments on HSV Color Space (CM): represent the first three central moments of an image color distribution: mean, standard deviation and skewness; 
+Global Color Naming Histogram (CN): maps colors to 11 universal color names: "black", "blue", "brown", "grey", "green", "orange", "pink", "purple", "red", "white", and "yellow".
 
 %We experimented with HOG feature distances but did not achieve any additional improvement.
 
@@ -101,7 +98,6 @@ In the fourth run participants were provided with credibility descriptors \cite{
 
 Using the original result we filtered the images by users who had $faceProportion$ more than $1.3$ to create the same effect as we did with the $FACE$ descriptor.
 
-\pagebreak
 
 With the purpose of increasing the diversity we used the $locationSimilarity$ descriptor, if this value exceeds the threshold of $3.0$ we excluded the image. Despite our simple approach we had great results on the development set.
 
@@ -114,19 +110,29 @@ With the purpose of increasing the diversity we used the $locationSimilarity$ de
 	run name & P@20 & CR@20 & F1@20\tabularnewline
 	\hline 
 	\hline 
-	Run1 single & .7022 & .3702 & .4751\tabularnewline
+	Run1 (all)& .7094 & .3780 & .4782\tabularnewline
+	\hline
+	Run2 (all) & .6730 & .3655 & .4565\tabularnewline
+	\hline
+	Run3 (all) & .6863 & .3624 & .4603\tabularnewline
+	\hline
+	Run4 (all) & .7083 & .3543 & .4564\tabularnewline
 	\hline 
-	Run1 multi & .7164 & .3857 & .4813\tabularnewline
+	\hline 
+	Run1 single & .7022 & .3702 & .4751\tabularnewline
 	\hline 
 	Run2 single & .6435 & .3494 & .4379\tabularnewline
 	\hline 
-	Run2 multi & .7021 & .3813 & .4748\tabularnewline
-	\hline 
 	Run3 single & .6732 & .3563 & .4554\tabularnewline
 	\hline 
-	Run3 multi & .6993 & .3683 & .4651\tabularnewline
-	\hline 
 	Run4 single & .7014 & .3589 & .4651\tabularnewline
+	\hline
+	\hline  
+	Run1 multi & .7164 & .3857 & .4813\tabularnewline
+	\hline 
+	Run2 multi & .7021 & .3813 & .4748\tabularnewline
+	\hline 
+	Run3 multi & .6993 & .3683 & .4651\tabularnewline
 	\hline 
 	Run4 multi & .7150 & .3498 & .4479\tabularnewline
 	\hline
